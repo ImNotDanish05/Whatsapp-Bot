@@ -1,16 +1,6 @@
-<style>
-.img-hover:hover {
-  transform: scale(1.1) rotate(2deg);
-  transition: 0.3s ease-in-out;
-}
-.img-hover {
-  transition: 0.3s ease-in-out;
-}
-</style>
-
 <p align="center">
   <a href="https://www.youtube.com/@ImNotDanish05" target="_blank">
-    <img src="logo.png" alt="Logo" width="250" class="img-hover">
+    <img src="logo.png" alt="Logo" width="500" class="img-hover">
   </a>
 </p>
 
