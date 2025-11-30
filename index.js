@@ -15,6 +15,7 @@ const settingsApiRoutes = require('./src/routes/api/settings');
 const { runScheduler } = require('./src/bot/scheduler');
 const { initQrState } = require('./src/qrService');
 const webSocket = require('./src/websocket');
+const botClient = require('./src/bot/index');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -54,7 +55,7 @@ app.use('/settings', settingsRoutes);
 app.use('/', indexRoutes);
 
 // WhatsApp Bot
-require('./src/bot/index');
+// (already required as botClient above)
 
 // Cron Job
 // Runs every day at midnight
@@ -69,8 +70,9 @@ cron.schedule('0 0 * * *', () => {
         const { getOrCreateSettings } = require('./src/settingsService');
         const settings = await getOrCreateSettings();
         if (settings.sendOnStartupEnabled) {
-            console.log('Running birthday check on startup (per settings)...');
-            runScheduler();
+            console.log('Running birthday check on startup (per settings)... waiting for bot ready');
+            await botClient.ready;
+            await runScheduler();
         }
     } catch (err) {
         console.error('Failed to run startup scheduler', err);

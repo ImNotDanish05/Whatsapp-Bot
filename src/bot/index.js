@@ -3,6 +3,11 @@ const qrcode = require('qrcode-terminal');
 const webSocket = require('../websocket');
 const { saveQrString, markAuthenticated } = require('../qrService');
 
+let readyResolve;
+const ready = new Promise(resolve => {
+    readyResolve = resolve;
+});
+
 const client = new Client({
     authStrategy: new LocalAuth(),
     // Disable local web cache to avoid crashing when manifest pattern changes upstream.
@@ -47,6 +52,7 @@ client.on('ready', async () => {
         console.error('Failed to mark authenticated state', err);
     }
     webSocket.broadcast({ type: 'ready', message: 'Client is ready.' });
+    if (readyResolve) readyResolve();
 });
 
 client.on('authenticated', async (session) => {
@@ -85,3 +91,4 @@ client.initialize().catch(err => {
 });
 
 module.exports = client;
+module.exports.ready = ready;
