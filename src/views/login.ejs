@@ -4,160 +4,135 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@200;300;400;500;600;700&display=swap");
 
-    <!-- Google Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+        /* Namespace everything to avoid KaiAdmin/Bootstrap bleed */
+        .login-page, .login-page * { box-sizing: border-box; font-family: "Open Sans", sans-serif; }
+        body.login-page {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 100vh;
+          width: 100vw;
+          position: relative;
+          overflow: hidden;
+          background: url("/assets/img/bg-404.jpeg") center center / cover no-repeat #000;
+        }
+        .login-page .wrapper {
+            width: 400px;
+            border-radius: 12px;
+            padding: 35px 30px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.05) !important;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: none !important;
+        }
+        .login-page form { display: flex; flex-direction: column; }
+        .login-page h2 { font-size: 2rem; margin-bottom: 25px; color: #fff; }
+        .login-page .input-field {
+            position: relative;
+            margin: 20px 0;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.4) !important;
+        }
+        .login-page .input-field label,
+        .login-page .login-label {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            color: #eee !important;
+            font-size: 16px;
+            pointer-events: none;
+            transition: 0.15s ease;
+        }
+        .login-page .input-field input,
+        .login-page .login-input,
+        .login-page input {
+            width: 100%;
+            height: 40px;
+            background: transparent !important;
+            background-color: transparent !important;
+            border: none !important;
+            outline: none !important;
+            font-size: 16px;
+            color: #fff !important;
+            box-shadow: none !important;
+            padding: 0;
+        }
+        .login-page .input-field input:focus ~ label,
+        .login-page .input-field input:valid ~ label {
+            font-size: 0.8rem;
+            top: 10px;
+            transform: translateY(-120%);
+        }
+        .login-page button,
+        .login-page .login-btn {
+            background: #fff !important;
+            color: #000 !important;
+            font-weight: 600;
+            border: 2px solid transparent !important;
+            padding: 12px 20px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: 0.3s ease;
+            width: 100%;
+            margin-top: 25px;
+            box-shadow: none !important;
+        }
+        .login-page button:hover,
+        .login-page .login-btn:hover {
+            color: #fff !important;
+            border-color: #fff !important;
+            background: rgba(255, 255, 255, 0.15) !important;
+        }
+        .login-page .error {
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 8px;
+            background: rgba(255, 0, 0, 0.28);
+            border: 1px solid rgba(255, 0, 0, 0.5);
+            color: #fff;
+            font-size: 0.9rem;
+        }
 
-<style>
-@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@200;300;400;500;600;700&display=swap");
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Open Sans", sans-serif;
-}
-
-body {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  width: 100%;
-  padding: 0 10px;
-  position: relative;
-  overflow: hidden;
-}
-
-body::before {
-  content: "";
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  background: url("/assets/img/bg-404.jpeg"), #000;
-  background-position: center;
-  background-size: cover;
-  z-index: -1;
-}
-
-/* FIXED: wrapper dibuat lebih gelap */
-.wrapper {
-  width: 400px;
-  border-radius: 12px;
-  padding: 35px 30px;
-  text-align: center;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
-
-/* FIXED: NO solid white background anywhere */
-form {
-  display: flex;
-  flex-direction: column;
-}
-
-h2 {
-  font-size: 2rem;
-  margin-bottom: 25px;
-  color: #fff;
-}
-
-/* FIXED: remove the big gray block effect */
-.input-field {
-  position: relative;
-  margin: 20px 0;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.4);
-}
-
-/* FIXED: Text floating label */
-.input-field label {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  transform: translateY(-50%);
-  color: #eee;
-  font-size: 16px;
-  pointer-events: none;
-  transition: 0.15s ease;
-}
-
-.input-field input {
-  width: 100%;
-  height: 40px;
-  background: transparent; /* ← FIX */
-  border: none;
-  outline: none;
-  font-size: 16px;
-  color: #fff;
-}
-
-/* Floating animation */
-.input-field input:focus ~ label,
-.input-field input:valid ~ label {
-  font-size: 0.8rem;
-  top: 10px;
-  transform: translateY(-120%);
-}
-
-/* FIXED: button always white with soft hover */
-button {
-  background: #fff;
-  color: #000;
-  font-weight: 600;
-  border: none;
-  padding: 12px 20px;
-  cursor: pointer;
-  border-radius: 4px;
-  font-size: 16px;
-  border: 2px solid transparent;
-  transition: 0.3s ease;
-  width: 100%;
-  margin-top: 25px;
-}
-
-button:hover {
-  color: #fff;
-  border-color: #fff;
-  background: rgba(255, 255, 255, 0.15);
-}
-
-/* FIXED: make error soft and match glassmorphism */
-.error {
-    margin-top: 20px;
-    padding: 12px;
-    border-radius: 8px;
-    background: rgba(255, 0, 0, 0.28);
-    border: 1px solid rgba(255, 0, 0, 0.5);
-    color: #fff;
-    font-size: 0.9rem;
-}
-</style>
-
+        /* Strong autofill overrides */
+        .login-page input:-webkit-autofill,
+        .login-page input:-webkit-autofill:hover,
+        .login-page input:-webkit-autofill:focus,
+        .login-page input:-webkit-autofill:active {
+            transition: background-color 9999s ease-in-out 0s !important;
+            -webkit-text-fill-color: #fff !important;
+            caret-color: #fff !important;
+            box-shadow: 0 0 0 1000px transparent inset !important;
+            background-color: transparent !important;
+        }
+    </style>
 </head>
 
-<body>
+<body class="login-page">
     <div class="wrapper">
-        <form method="POST" action="/login">
+        <form method="POST" action="/login" autocomplete="off">
             <h2>Login</h2>
 
-            <div class="input-field">
-                <input type="text" name="username" id="username" required autocomplete="username">
-                <label for="username">Enter your username</label>
+            <div class="input-field login-field">
+                <input class="login-input" type="text" name="username" id="username" required autocomplete="off">
+                <label class="login-label" for="username">Enter your username</label>
             </div>
 
-            <div class="input-field">
-                <input type="password" name="password" id="password" required autocomplete="current-password">
-                <label for="password">Enter your password</label>
+            <div class="input-field login-field">
+                <input class="login-input" type="password" name="password" id="password" required autocomplete="new-password">
+                <label class="login-label" for="password">Enter your password</label>
             </div>
 
-            <button type="submit">Log In</button>
+            <button type="submit" class="login-btn">Log In</button>
 
             <% if (error) { %>
                 <div class="error"><%= error %></div>
             <% } %>
-
         </form>
     </div>
 </body>
