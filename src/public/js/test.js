@@ -30,10 +30,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!img) return;
             if (url) {
                 img.src = `${url}?t=${Date.now()}`;
-                img.classList.remove('hidden');
+                img.classList.remove('d-none', 'hidden');
             } else {
                 img.src = '';
-                img.classList.add('hidden');
+                img.classList.add('d-none');
             }
         });
     };
