@@ -1,53 +1,66 @@
 <%- include('partials/header') %>
 
-<div class="px-4 py-6 sm:px-0">
-    <div class="bg-white shadow rounded-lg p-6">
-        <h1 class="text-2xl font-bold text-gray-800 mb-4">WhatsApp Bot Testing</h1>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Send Message -->
-            <div class="bg-gray-50 p-4 rounded-lg">
-                <h2 class="text-xl font-semibold text-gray-700 mb-4">Send Test Message</h2>
+<div class="page-header">
+    <h4 class="page-title">WhatsApp Bot Testing</h4>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">Send Test Message</h4>
+            </div>
+            <div class="card-body">
                 <form id="sendMessageForm">
-                    <div class="mb-4">
-                        <label for="phone" class="block text-sm font-medium text-gray-700">Target Phone Number</label>
-                        <input type="text" name="phone" id="phone" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="+6281234567890">
+                    <div class="form-group">
+                        <label for="phone">Target Phone Number</label>
+                        <input type="text" name="phone" id="phone" class="form-control" placeholder="+6281234567890">
                     </div>
-                    <div class="mb-4">
-                        <label for="message" class="block text-sm font-medium text-gray-700">Message</label>
-                        <textarea name="message" id="message" rows="4" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Enter your message"></textarea>
+                    <div class="form-group">
+                        <label for="message">Message</label>
+                        <textarea name="message" id="message" rows="4" class="form-control" placeholder="Enter your message"></textarea>
                     </div>
-                    <button type="submit" class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                        Send Test Message
-                    </button>
+                    <button type="submit" class="btn btn-primary btn-block">Send Test Message</button>
                 </form>
             </div>
+        </div>
+    </div>
 
-            <!-- Bot Status -->
-            <div class="bg-gray-50 p-4 rounded-lg">
-                <h2 class="text-xl font-semibold text-gray-700 mb-4">Live Bot Status</h2>
-                <div id="bot-status">
-                    <p>QR Scanned: <span id="qr-status" class="font-bold text-red-500">No</span></p>
-                    <p>Client Ready: <span id="ready-status" class="font-bold text-red-500">No</span></p>
-                    <p>Last Sent Message: <span id="last-sent-status" class="font-mono">N/A</span></p>
-                    <p>Last Incoming Message: <span id="last-incoming-message" class="font-mono">N/A</span></p>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">Live Bot Status</h4>
+            </div>
+            <div class="card-body">
+                <div id="bot-status" class="mb-3">
+                    <p>QR Scanned: <span id="qr-status" class="fw-bold text-danger">No</span></p>
+                    <p>Client Ready: <span id="ready-status" class="fw-bold text-danger">No</span></p>
+                    <p>Last Sent Message: <span id="last-sent-status" class="font-monospace">N/A</span></p>
+                    <p>Last Incoming Message: <span id="last-incoming-message" class="font-monospace">N/A</span></p>
                 </div>
-                <div class="mt-4">
-                    <h3 class="text-lg font-semibold text-gray-700 mb-2">Scan QR to Connect</h3>
-                    <img id="qr-image" class="bg-white p-3 rounded shadow inline-block hidden" alt="WhatsApp QR" />
-                    <p id="qr-hint" class="text-sm text-gray-500 mt-2">Waiting for QR code...</p>
+                <div class="text-center mb-3">
+                    <h5 class="mb-2">Scan QR to Connect</h5>
+                    <img id="qr-image" class="bg-white p-3 rounded shadow d-none" alt="WhatsApp QR" />
+                    <p id="qr-hint" class="text-muted small mt-2">Waiting for QR code...</p>
                 </div>
-                <div class="mt-4 space-x-2">
-                    <button id="pingBtn" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Ping Bot</button>
-                    <button id="cronBtn" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">Simulate Daily Cron</button>
+                <div class="d-flex gap-2">
+                    <button id="pingBtn" class="btn btn-success">Ping Bot</button>
+                    <button id="cronBtn" class="btn btn-warning text-white">Simulate Daily Cron</button>
                 </div>
             </div>
         </div>
+    </div>
+</div>
 
-        <!-- Console Log -->
-        <div class="mt-6 bg-gray-900 text-white p-4 rounded-lg h-64 overflow-y-auto">
-            <h2 class="text-xl font-semibold mb-2">Bot Logs</h2>
-            <div id="log-console"></div>
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title mb-0">Bot Logs</h4>
+            </div>
+            <div class="card-body bg-dark text-white" style="height: 260px; overflow-y: auto;">
+                <div id="log-console" class="small"></div>
+            </div>
         </div>
     </div>
 </div>

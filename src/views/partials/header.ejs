@@ -4,23 +4,138 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WhatsApp Bot - <%= title %></title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="/assets/img/kaiadmin/favicon.ico" type="image/x-icon">
+    <script src="/assets/js/plugin/webfont/webfont.min.js"></script>
+    <script>
+        WebFont.load({
+            google: { families: ["Public Sans:300,400,500,600,700"] },
+            custom: {
+                families: [
+                    "Font Awesome 5 Solid",
+                    "Font Awesome 5 Regular",
+                    "Font Awesome 5 Brands",
+                    "simple-line-icons",
+                ],
+                urls: ["/assets/css/fonts.min.css"],
+            },
+            active: function () {
+                sessionStorage.fonts = true;
+            },
+        });
+    </script>
+    <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/css/plugins.min.css">
+    <link rel="stylesheet" href="/assets/css/kaiadmin.min.css">
 </head>
-<body class="bg-gray-100">
-    <nav class="bg-white shadow-md">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex items-center">
-                    <a href="/" class="text-xl font-bold text-gray-800">WhatsApp Bot</a>
+<body>
+    <div class="wrapper">
+        <div class="sidebar" data-background-color="dark">
+            <div class="sidebar-logo">
+                <div class="logo-header" data-background-color="dark">
+                    <a href="/" class="logo">
+                        <img src="/assets/img/kaiadmin/logo_light.svg" alt="KaiAdmin Logo" class="navbar-brand" height="20">
+                    </a>
+                    <div class="nav-toggle">
+                        <button class="btn btn-toggle toggle-sidebar">
+                            <i class="gg-menu-right"></i>
+                        </button>
+                        <button class="btn btn-toggle sidenav-toggler">
+                            <i class="gg-menu-left"></i>
+                        </button>
+                    </div>
+                    <button class="topbar-toggler more">
+                        <i class="gg-more-vertical-alt"></i>
+                    </button>
                 </div>
-                <div class="flex space-x-4">
-                    <a href="/" class="text-gray-600 hover:text-gray-800 px-3 py-2 rounded-md text-sm font-medium">Home</a>
-                    <a href="/birthdays" class="text-gray-600 hover:text-gray-800 px-3 py-2 rounded-md text-sm font-medium">Birthdays</a>
-                    <a href="/logs" class="text-gray-600 hover:text-gray-800 px-3 py-2 rounded-md text-sm font-medium">Logs</a>
-                    <a href="/test" class="text-gray-600 hover:text-gray-800 px-3 py-2 rounded-md text-sm font-medium">Test</a>
-                    <a href="/settings" class="text-gray-600 hover:text-gray-800 px-3 py-2 rounded-md text-sm font-medium">Settings</a>
+            </div>
+            <div class="sidebar-wrapper scrollbar scrollbar-inner">
+                <div class="sidebar-content">
+                    <ul class="nav nav-primary">
+                        <li class="nav-item">
+                            <a href="/">
+                                <i class="fas fa-home"></i>
+                                <p>Home</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/birthdays">
+                                <i class="fas fa-birthday-cake"></i>
+                                <p>Birthdays</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/logs">
+                                <i class="fas fa-list"></i>
+                                <p>Logs</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/test">
+                                <i class="fas fa-vial"></i>
+                                <p>Test</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/settings">
+                                <i class="fas fa-cog"></i>
+                                <p>Settings</p>
+                            </a>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
-    </nav>
-    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+
+        <div class="main-panel">
+            <div class="main-header">
+                <div class="main-header-logo">
+                    <div class="logo-header" data-background-color="dark2">
+                        <a href="/" class="logo">
+                            <img src="/assets/img/kaiadmin/logo_light.svg" alt="KaiAdmin Logo" class="navbar-brand" height="20">
+                        </a>
+                        <div class="nav-toggle">
+                            <button class="btn btn-toggle toggle-sidebar">
+                                <i class="gg-menu-right"></i>
+                            </button>
+                            <button class="btn btn-toggle sidenav-toggler">
+                                <i class="gg-menu-left"></i>
+                            </button>
+                        </div>
+                        <button class="topbar-toggler more">
+                            <i class="gg-more-vertical-alt"></i>
+                        </button>
+                    </div>
+                </div>
+                <nav class="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom" data-background-color="dark2">
+                    <div class="container-fluid">
+                        <div class="collapse navbar-collapse">
+                            <ul class="navbar-nav ms-auto align-items-center">
+                                <li class="nav-item topbar-user dropdown hidden-caret">
+                                    <a class="dropdown-toggle profile-pic" data-bs-toggle="dropdown" href="#" aria-expanded="false">
+                                        <div class="avatar-sm">
+                                            <img src="/assets/img/profile.jpg" alt="Profile" class="avatar-img rounded-circle">
+                                        </div>
+                                        <span class="profile-username text-white ms-2">Demo User</span>
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-user animated fadeIn">
+                                        <li>
+                                            <div class="dropdown-user-scroll scrollbar-outer">
+                                                <div class="user-box">
+                                                    <div class="avatar-lg"><img src="/assets/img/profile.jpg" alt="image profile" class="avatar-img rounded"></div>
+                                                    <div class="u-text">
+                                                        <h4>Demo User</h4>
+                                                        <p class="text-muted">demo@example.com</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+
+            <div class="container">
+                <div class="page-inner">

@@ -1,38 +1,64 @@
 <%- include('partials/header') %>
 
-<div class="px-4 py-6 sm:px-0">
-    <div class="bg-white shadow rounded-lg p-6">
-        <h1 class="text-2xl font-bold text-gray-800 mb-4">Test Reports</h1>
+<div class="page-header">
+    <h4 class="page-title">Test Reports</h4>
+</div>
 
-        <!-- Filters -->
-        <div class="flex space-x-4 mb-4">
-            <input type="text" id="phoneFilter" placeholder="Filter by phone..." class="px-3 py-2 border border-gray-300 rounded-md">
-            <select id="statusFilter" class="px-3 py-2 border border-gray-300 rounded-md">
-                <option value="">All Statuses</option>
-                <option value="success">Success</option>
-                <option value="failed">Failed</option>
-            </select>
-            <input type="date" id="dateFilter" class="px-3 py-2 border border-gray-300 rounded-md">
-            <button id="filterBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Filter</button>
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title mb-0">Filters</h4>
+            </div>
+            <div class="card-body">
+                <div class="form-row align-items-end">
+                    <div class="form-group col-md-3">
+                        <label for="phoneFilter">Filter by phone</label>
+                        <input type="text" id="phoneFilter" class="form-control" placeholder="Filter by phone...">
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="statusFilter">Status</label>
+                        <select id="statusFilter" class="form-control">
+                            <option value="">All Statuses</option>
+                            <option value="success">Success</option>
+                            <option value="failed">Failed</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="dateFilter">Date</label>
+                        <input type="date" id="dateFilter" class="form-control">
+                    </div>
+                    <div class="form-group col-md-3">
+                        <button id="filterBtn" class="btn btn-primary btn-block">Filter</button>
+                    </div>
+                </div>
+            </div>
         </div>
+    </div>
+</div>
 
-        <!-- Reports Table -->
-        <div class="overflow-x-auto">
-            <table class="min-w-full bg-white">
-                <thead class="bg-gray-800 text-white">
-                    <tr>
-                        <th class="w-1/6 py-3 px-4 uppercase font-semibold text-sm">Phone</th>
-                        <th class="w-1/4 py-3 px-4 uppercase font-semibold text-sm">Message</th>
-                        <th class="w-1/4 py-3 px-4 uppercase font-semibold text-sm">Response</th>
-                        <th class="w-1/12 py-3 px-4 uppercase font-semibold text-sm">Status</th>
-                        <th class="w-1/12 py-3 px-4 uppercase font-semibold text-sm">Type</th>
-                        <th class="w-1/6 py-3 px-4 uppercase font-semibold text-sm">Timestamp</th>
-                    </tr>
-                </thead>
-                <tbody class="text-gray-700" id="reports-table-body">
-                    <!-- Rows will be inserted here by JavaScript -->
-                </tbody>
-            </table>
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>Phone</th>
+                                <th>Message</th>
+                                <th>Response</th>
+                                <th>Status</th>
+                                <th>Type</th>
+                                <th>Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reports-table-body">
+                            <!-- Rows will be inserted here by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>
