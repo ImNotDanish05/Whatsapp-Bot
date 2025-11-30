@@ -9,6 +9,8 @@ npm-debug.log
 coverage
 .vscode
 .idea
+src\storage\qr\*
+src\public\storage\qr\*
 error_summary_imnotdanish05.md
 app_summary_imnotdanish05.md
 command_imnotdanish05.md
