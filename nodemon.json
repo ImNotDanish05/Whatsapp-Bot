@@ -1,0 +1,4 @@
+{
+  "watch": ["src", "app", "routes"], 
+  "ignore": ["src/public/storage/qr/*", "src/public/qr/*", "src/storage/qr/*"]
+}

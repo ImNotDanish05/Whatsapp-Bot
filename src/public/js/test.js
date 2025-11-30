@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Poll QR endpoint for reliability (no WebSocket reliance).
     refreshQrFromApi();
-    setInterval(refreshQrFromApi, 4000);
+    setInterval(refreshQrFromApi, 10000);
 
     // Optional WebSocket for live logs (non-critical for QR).
     if (logConsole) {
