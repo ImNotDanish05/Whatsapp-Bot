@@ -28,10 +28,20 @@
                     <span class="font-semibold text-gray-700">Send to group</span>
                 </label>
                 <textarea id="groupMessageTemplate" rows="3" class="w-full border rounded p-2" placeholder="Everyone say happy birthday to %name%!"></textarea>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Group IDs (one per line)</label>
-                    <textarea id="selectedGroups" rows="3" class="w-full border rounded p-2" placeholder="1234567890-123456@g.us"></textarea>
-                    <p class="text-xs text-gray-500 mt-1">If you don't have group IDs, paste them manually. We'll append @g.us if missing.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Search Group By Name</label>
+                        <div class="flex space-x-2">
+                            <input type="text" id="groupSearchInput" class="flex-1 border rounded p-2" placeholder="Training TB">
+                            <button type="button" id="groupSearchBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-3 py-2 rounded">Search</button>
+                        </div>
+                        <div id="groupSearchResults" class="border rounded p-2 h-40 overflow-y-auto text-sm text-gray-700"></div>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Saved Groups</label>
+                        <div id="savedGroups" class="border rounded p-2 h-40 overflow-y-auto text-sm text-gray-700"></div>
+                        <p class="text-xs text-gray-500 mt-1">Check to enable sending to that group. Uncheck to exclude. Remove to delete.</p>
+                    </div>
                 </div>
             </div>
 
@@ -70,7 +80,7 @@
             document.getElementById('directMessageTemplate').value = s.directMessageTemplate || '';
             document.getElementById('groupMessageEnabled').checked = s.groupMessageEnabled;
             document.getElementById('groupMessageTemplate').value = s.groupMessageTemplate || '';
-            document.getElementById('selectedGroups').value = (s.selectedGroups || []).join('\\n');
+            renderSavedGroups(s.selectedGroups || []);
             document.getElementById('statusEnabled').checked = s.statusEnabled;
             document.getElementById('statusTemplate').value = s.statusTemplate || '';
             document.getElementById('sendOnStartupEnabled').checked = s.sendOnStartupEnabled;
@@ -78,12 +88,100 @@
         }
     }
 
+    function renderSavedGroups(groups) {
+        const container = document.getElementById('savedGroups');
+        container.innerHTML = '';
+        if (!groups.length) {
+            container.innerHTML = '<p class="text-xs text-gray-500">No saved groups.</p>';
+            return;
+        }
+        groups.forEach((g, idx) => {
+            const row = document.createElement('div');
+            row.className = 'saved-group-item flex items-center justify-between py-1';
+            row.innerHTML = `
+                <label class="flex items-center space-x-2">
+                    <input type="checkbox" class="h-4 w-4 text-indigo-600 border-gray-300 rounded" data-name="${g.name || ''}" data-id="${g.id || ''}" checked>
+                    <span>${g.name || '(no name)'} \u2013 ${g.id || ''}</span>
+                </label>
+                <button type="button" class="text-red-600 text-xs remove-saved-group" data-index="${idx}">Remove</button>
+            `;
+            container.appendChild(row);
+        });
+
+        container.querySelectorAll('.remove-saved-group').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const index = parseInt(btn.dataset.index, 10);
+                const groupsNow = Array.from(container.querySelectorAll('.saved-group-item input[type="checkbox"]')).map(cb => ({
+                    name: cb.dataset.name,
+                    id: cb.dataset.id,
+                    checked: cb.checked
+                }));
+                groupsNow.splice(index, 1);
+                renderSavedGroups(groupsNow);
+            });
+        });
+    }
+
+    function renderSearchResults(results) {
+        const container = document.getElementById('groupSearchResults');
+        container.innerHTML = '';
+        if (!results.length) {
+            container.innerHTML = '<p class="text-xs text-gray-500">No groups found.</p>';
+            return;
+        }
+        results.forEach(g => {
+            const row = document.createElement('div');
+            row.className = 'flex items-center space-x-2 py-1';
+            row.innerHTML = `
+                <input type="checkbox" class="group-search-item h-4 w-4 text-indigo-600 border-gray-300 rounded" data-name="${g.name}" data-id="${g.id}">
+                <span>${g.name} \u2013 ${g.id}</span>
+            `;
+            container.appendChild(row);
+        });
+    }
+
+    document.getElementById('groupSearchBtn').addEventListener('click', async () => {
+        const name = document.getElementById('groupSearchInput').value.trim();
+        if (!name) return;
+        const res = await fetch('/api/groups/search', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name })
+        });
+        const data = await res.json();
+        if (data.status === 'ok') {
+            renderSearchResults(data.data || []);
+        }
+    });
+
+    // Move selected search results into saved list
+    document.getElementById('groupSearchResults').addEventListener('change', (e) => {
+        if (!e.target.classList.contains('group-search-item')) return;
+        const selected = Array.from(document.querySelectorAll('.group-search-item'))
+            .filter(cb => cb.checked)
+            .map(cb => ({ name: cb.dataset.name, id: cb.dataset.id }));
+        if (selected.length) {
+            // Merge with existing saved groups
+            const existing = Array.from(document.querySelectorAll('.saved-group-item input[type="checkbox"]')).map(cb => ({
+                name: cb.dataset.name,
+                id: cb.dataset.id,
+                checked: cb.checked
+            }));
+            const merged = [...existing];
+            selected.forEach(s => {
+                if (!merged.find(m => m.id === s.id)) {
+                    merged.push({ ...s, checked: true });
+                }
+            });
+            renderSavedGroups(merged);
+        }
+    });
+
     document.getElementById('settings-form').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const selectedGroups = document.getElementById('selectedGroups').value
-            .split(/\\r?\\n/)
-            .map(g => g.trim())
-            .filter(Boolean);
+        const selectedGroups = Array.from(document.querySelectorAll('.saved-group-item input[type="checkbox"]'))
+            .filter(cb => cb.checked)
+            .map(cb => ({ name: cb.dataset.name, id: cb.dataset.id }));
 
         const payload = {
             directMessageEnabled: document.getElementById('directMessageEnabled').checked,

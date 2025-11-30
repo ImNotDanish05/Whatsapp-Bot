@@ -31,9 +31,12 @@ exports.updateSettings = async (req, res) => {
         settings.directMessageEnabled = directMessageEnabled !== undefined ? !!directMessageEnabled : settings.directMessageEnabled;
         settings.directMessageTemplate = directMessageTemplate || DEFAULTS.directMessageTemplate;
         settings.groupMessageEnabled = groupMessageEnabled !== undefined ? !!groupMessageEnabled : settings.groupMessageEnabled;
-        settings.selectedGroups = Array.isArray(selectedGroups)
-            ? selectedGroups.filter(g => g && g.trim() !== '')
-            : settings.selectedGroups;
+        if (Array.isArray(selectedGroups)) {
+            const { normalizeGroupEntry } = require('../settingsService');
+            settings.selectedGroups = selectedGroups
+                .map(normalizeGroupEntry)
+                .filter(Boolean);
+        }
         settings.groupMessageTemplate = groupMessageTemplate || DEFAULTS.groupMessageTemplate;
         settings.statusEnabled = statusEnabled !== undefined ? !!statusEnabled : settings.statusEnabled;
         settings.statusTemplate = statusTemplate || DEFAULTS.statusTemplate;

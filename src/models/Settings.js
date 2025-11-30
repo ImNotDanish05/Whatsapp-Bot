@@ -14,7 +14,12 @@ const settingsSchema = new mongoose.Schema({
         default: false
     },
     selectedGroups: {
-        type: [String],
+        type: [
+            {
+                name: { type: String },
+                id: { type: String }
+            }
+        ],
         default: []
     },
     groupMessageTemplate: {

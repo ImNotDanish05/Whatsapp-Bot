@@ -42,9 +42,21 @@ function normalizeGroupId(groupId) {
     return `${trimmed}@g.us`;
 }
 
+function normalizeGroupEntry(entry) {
+    if (!entry) return null;
+    if (typeof entry === 'string') {
+        return { name: entry, id: normalizeGroupId(entry) };
+    }
+    const name = entry.name || '';
+    const id = normalizeGroupId(entry.id || entry.groupId || entry.group_id || name);
+    if (!id) return null;
+    return { name, id };
+}
+
 module.exports = {
     getOrCreateSettings,
     formatTemplate,
     normalizeGroupId,
+    normalizeGroupEntry,
     DEFAULTS
 };

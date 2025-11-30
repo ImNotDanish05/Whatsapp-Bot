@@ -54,7 +54,7 @@ async function runScheduler() {
         if (settings.groupMessageEnabled && Array.isArray(settings.selectedGroups)) {
             const groupMessage = formatTemplate(settings.groupMessageTemplate, birthday);
             for (const g of settings.selectedGroups) {
-                const gid = normalizeGroupId(g);
+                const gid = normalizeGroupId(g.id || g);
                 if (!gid) continue;
                 await sendAndLog(gid, groupMessage);
             }

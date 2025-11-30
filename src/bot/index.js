@@ -32,7 +32,7 @@ client.on('error', (err) => {
 });
 
 client.on('qr', async (qr) => {
-    // Keep terminal output so you can confirm the QR is emitted.
+    // Keep terminal output so you can confirm the QR is emitted.a
     console.log('QR RECEIVED (string):', qr);
     qrcode.generate(qr, { small: true });
     try {
