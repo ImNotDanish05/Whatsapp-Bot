@@ -11,7 +11,17 @@
         </div>
         <div class="mt-8">
             <h2 class="text-xl font-semibold text-gray-700">Bot Status</h2>
-            <p class="text-gray-600 mt-2">Scan the QR code in your terminal to connect the bot.</p>
+            <p class="text-gray-600 mt-2">Scan the QR code below to connect the bot.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                <div>
+                    <p>QR Status: <span id="home-qr-status" class="font-bold text-red-500">No</span></p>
+                    <p>Client Ready: <span id="home-ready-status" class="font-bold text-red-500">No</span></p>
+                </div>
+                <div>
+                    <img id="home-qr-image" class="bg-white p-3 rounded shadow inline-block hidden" alt="WhatsApp QR" />
+                    <p id="home-qr-hint" class="text-sm text-gray-500 mt-2">Waiting for QR code...</p>
+                </div>
+            </div>
         </div>
     </div>
 </div>

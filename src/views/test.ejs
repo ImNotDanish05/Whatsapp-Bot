@@ -32,6 +32,11 @@
                     <p>Last Sent Message: <span id="last-sent-status" class="font-mono">N/A</span></p>
                     <p>Last Incoming Message: <span id="last-incoming-message" class="font-mono">N/A</span></p>
                 </div>
+                <div class="mt-4">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-2">Scan QR to Connect</h3>
+                    <img id="qr-image" class="bg-white p-3 rounded shadow inline-block hidden" alt="WhatsApp QR" />
+                    <p id="qr-hint" class="text-sm text-gray-500 mt-2">Waiting for QR code...</p>
+                </div>
                 <div class="mt-4 space-x-2">
                     <button id="pingBtn" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Ping Bot</button>
                     <button id="cronBtn" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">Simulate Daily Cron</button>

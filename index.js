@@ -9,7 +9,9 @@ const logRoutes = require('./src/routes/logs');
 const indexRoutes = require('./src/routes/index');
 const testRoutes = require('./src/routes/test');
 const testApiRoutes = require('./src/routes/api/test');
+const qrRoutes = require('./src/routes/qr');
 const { runScheduler } = require('./src/bot/scheduler');
+const { initQrState } = require('./src/qrService');
 const webSocket = require('./src/websocket');
 
 const app = express();
@@ -34,10 +36,16 @@ mongoose.connect(process.env.MONGODB_URI, {
     console.error('Could not connect to MongoDB', err);
 });
 
+// Ensure QR storage directories/state exist before bot init
+initQrState().catch(err => {
+    console.error('Failed to initialize QR storage', err);
+});
+
 // Routes
 app.use('/api/birthdays', birthdayRoutes);
 app.use('/api/logs', logRoutes);
 app.use('/api/test', testApiRoutes);
+app.use('/api/qr', qrRoutes);
 app.use('/test', testRoutes);
 app.use('/', indexRoutes);
 
