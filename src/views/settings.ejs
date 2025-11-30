@@ -13,6 +13,7 @@
     </div>
 </div>
 
+<% const canEditSettings = hasRole(['admin','superadmin']); %>
 <form id="settings-form">
 <div class="row">
     <div class="col-lg-6">
@@ -22,12 +23,12 @@
             </div>
             <div class="card-body">
                 <div class="form-group form-check">
-                    <input type="checkbox" id="directMessageEnabled" class="form-check-input">
+                    <input type="checkbox" id="directMessageEnabled" class="form-check-input" <%= canEditSettings ? '' : 'disabled' %>>
                     <label class="form-check-label" for="directMessageEnabled">Send to phone number</label>
                 </div>
                 <div class="form-group">
                     <label for="directMessageTemplate">Template</label>
-                    <textarea id="directMessageTemplate" rows="3" class="form-control" placeholder="Happy Birthday %name%!"></textarea>
+                    <textarea id="directMessageTemplate" rows="3" class="form-control" placeholder="Happy Birthday %name%!" <%= canEditSettings ? '' : 'disabled' %>></textarea>
                 </div>
             </div>
         </div>
@@ -38,12 +39,12 @@
             </div>
             <div class="card-body">
                 <div class="form-group form-check">
-                    <input type="checkbox" id="statusEnabled" class="form-check-input">
+                    <input type="checkbox" id="statusEnabled" class="form-check-input" <%= canEditSettings ? '' : 'disabled' %>>
                     <label class="form-check-label" for="statusEnabled">Post to status</label>
                 </div>
                 <div class="form-group">
                     <label for="statusTemplate">Template</label>
-                    <textarea id="statusTemplate" rows="3" class="form-control" placeholder="Selamat ulang tahun %name%!"></textarea>
+                    <textarea id="statusTemplate" rows="3" class="form-control" placeholder="Selamat ulang tahun %name%!" <%= canEditSettings ? '' : 'disabled' %>></textarea>
                 </div>
             </div>
         </div>
@@ -56,19 +57,19 @@
             </div>
             <div class="card-body">
                 <div class="form-group form-check">
-                    <input type="checkbox" id="groupMessageEnabled" class="form-check-input">
+                    <input type="checkbox" id="groupMessageEnabled" class="form-check-input" <%= canEditSettings ? '' : 'disabled' %>>
                     <label class="form-check-label" for="groupMessageEnabled">Send to group</label>
                 </div>
                 <div class="form-group">
                     <label for="groupMessageTemplate">Template</label>
-                    <textarea id="groupMessageTemplate" rows="3" class="form-control" placeholder="Everyone say happy birthday to %name%!"></textarea>
+                    <textarea id="groupMessageTemplate" rows="3" class="form-control" placeholder="Everyone say happy birthday to %name%!" <%= canEditSettings ? '' : 'disabled' %>></textarea>
                 </div>
                 <div class="row">
                     <div class="col-md-6">
                         <label class="font-weight-bold">Search Group By Name</label>
                         <div class="d-flex mb-2">
-                            <input type="text" id="groupSearchInput" class="form-control" placeholder="Nama Group">
-                            <button type="button" id="groupSearchBtn" class="btn btn-secondary ml-2">Search</button>
+                            <input type="text" id="groupSearchInput" class="form-control" placeholder="Nama Group" <%= canEditSettings ? '' : 'disabled' %>>
+                            <button type="button" id="groupSearchBtn" class="btn btn-secondary ml-2" <%= canEditSettings ? '' : 'disabled' %>>Search</button>
                         </div>
                         <div id="groupSearchResults" class="border rounded p-2" style="height: 200px; overflow-y: auto;"></div>
                     </div>
@@ -84,7 +85,7 @@
         <div class="card">
             <div class="card-body">
                 <div class="form-group form-check mb-0">
-                    <input type="checkbox" id="sendOnStartupEnabled" class="form-check-input">
+                    <input type="checkbox" id="sendOnStartupEnabled" class="form-check-input" <%= canEditSettings ? '' : 'disabled' %>>
                     <label class="form-check-label" for="sendOnStartupEnabled">Also send birthday messages on server startup</label>
                 </div>
                 <p class="text-muted small mt-1 mb-0">If enabled, the scheduler runs immediately when the server boots (in addition to midnight).</p>
@@ -96,7 +97,11 @@
 <div class="row mt-3">
     <div class="col-12">
         <div class="d-flex align-items-center">
-            <button type="submit" class="btn btn-primary">Save Settings</button>
+            <% if (canEditSettings) { %>
+                <button type="submit" class="btn btn-primary">Save Settings</button>
+            <% } else { %>
+                <span class="text-muted small">You do not have permission to edit settings.</span>
+            <% } %>
             <span id="settings-status" class="ml-3 text-muted small"></span>
         </div>
     </div>
@@ -104,6 +109,8 @@
 </form>
 
 <script>
+    const canEditSettingsFlag = <%= canEditSettings ? 'true' : 'false' %>;
+
     async function loadSettings() {
         const res = await fetch('/api/settings');
         const data = await res.json();
@@ -125,7 +132,7 @@
         const container = document.getElementById('savedGroups');
         container.innerHTML = '';
         if (!groups.length) {
-            container.innerHTML = '<p class="text-xs text-gray-500">No saved groups.</p>';
+            container.innerHTML = '<p class="text-muted small">No saved groups.</p>';
             return;
         }
         groups.forEach((g, idx) => {
@@ -159,7 +166,7 @@
         const container = document.getElementById('groupSearchResults');
         container.innerHTML = '';
         if (!results.length) {
-            container.innerHTML = '<p class="text-xs text-gray-500">No groups found.</p>';
+            container.innerHTML = '<p class="text-muted small">No groups found.</p>';
             return;
         }
         results.forEach(g => {
@@ -174,6 +181,7 @@
     }
 
     document.getElementById('groupSearchBtn').addEventListener('click', async () => {
+        if (!canEditSettingsFlag) return;
         const name = document.getElementById('groupSearchInput').value.trim();
         if (!name) return;
         const res = await fetch('/api/groups/search', {
@@ -189,6 +197,7 @@
 
     // Move selected search results into saved list
     document.getElementById('groupSearchResults').addEventListener('change', (e) => {
+        if (!canEditSettingsFlag) return;
         if (!e.target.classList.contains('group-search-item')) return;
         const selected = Array.from(document.querySelectorAll('.group-search-item'))
             .filter(cb => cb.checked)
@@ -212,6 +221,9 @@
 
     document.getElementById('settings-form').addEventListener('submit', async (e) => {
         e.preventDefault();
+        if (!canEditSettingsFlag) {
+            return false;
+        }
         const selectedGroups = Array.from(document.querySelectorAll('.saved-group-item input[type="checkbox"]'))
             .filter(cb => cb.checked)
             .map(cb => ({ name: cb.dataset.name, id: cb.dataset.id }));

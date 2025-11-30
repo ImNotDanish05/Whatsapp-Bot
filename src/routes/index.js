@@ -3,6 +3,7 @@ const router = express.Router();
 const Birthday = require('../models/Birthday');
 const Log = require('../models/Log');
 const dayjs = require('dayjs');
+const { hasRole } = require('../authMiddleware');
 
 // Home page
 router.get('/', async (req, res) => {
@@ -18,7 +19,7 @@ router.get('/', async (req, res) => {
 });
 
 // Birthdays page
-router.get('/birthdays', async (req, res) => {
+router.get('/birthdays', hasRole(['admin', 'operator', 'superadmin']), async (req, res) => {
     try {
         const birthdays = await Birthday.find().sort({ createdAt: -1 });
         res.render('birthdays', {
@@ -32,7 +33,7 @@ router.get('/birthdays', async (req, res) => {
 });
 
 // Logs page
-router.get('/logs', async (req, res) => {
+router.get('/logs', hasRole(['admin', 'operator', 'viewer', 'auditor', 'superadmin']), async (req, res) => {
     try {
         const logs = await Log.find().sort({ sentAt: -1 });
         res.render('logs', {

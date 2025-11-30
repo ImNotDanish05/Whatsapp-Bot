@@ -57,30 +57,46 @@
                                 <p>Home</p>
                             </a>
                         </li>
+                        <% if (hasRole(['admin','operator','superadmin'])) { %>
                         <li class="nav-item">
                             <a href="/birthdays">
                                 <i class="fas fa-birthday-cake"></i>
                                 <p>Birthdays</p>
                             </a>
                         </li>
+                        <% } %>
+                        <% if (hasRole(['admin','operator','viewer','auditor','superadmin'])) { %>
                         <li class="nav-item">
                             <a href="/logs">
                                 <i class="fas fa-list"></i>
                                 <p>Logs</p>
                             </a>
                         </li>
+                        <% } %>
+                        <% if (hasRole(['admin','operator','superadmin'])) { %>
                         <li class="nav-item">
                             <a href="/test">
                                 <i class="fas fa-vial"></i>
                                 <p>Test</p>
                             </a>
                         </li>
+                        <% } %>
+                        <% if (hasRole(['admin','operator','viewer','auditor','superadmin'])) { %>
                         <li class="nav-item">
                             <a href="/settings">
                                 <i class="fas fa-cog"></i>
                                 <p>Settings</p>
                             </a>
                         </li>
+                        <% } %>
+                        <% if (hasRole(['admin','superadmin'])) { %>
+                        <li class="nav-item">
+                            <a href="/users">
+                                <i class="fas fa-users-cog"></i>
+                                <p>Users</p>
+                            </a>
+                        </li>
+                        <% } %>
                     </ul>
                 </div>
             </div>
@@ -115,7 +131,7 @@
                                         <div class="avatar-sm">
                                             <img src="/assets/img/profile.jpg" alt="Profile" class="avatar-img rounded-circle">
                                         </div>
-                                        <span class="profile-username text-white ms-2">Demo User</span>
+                                        <span class="profile-username text-white ms-2"><%= user ? user.username : 'User' %></span>
                                     </a>
                                     <ul class="dropdown-menu dropdown-user animated fadeIn">
                                         <li>
@@ -123,11 +139,15 @@
                                                 <div class="user-box">
                                                     <div class="avatar-lg"><img src="/assets/img/profile.jpg" alt="image profile" class="avatar-img rounded"></div>
                                                     <div class="u-text">
-                                                        <h4>Demo User</h4>
-                                                        <p class="text-muted">demo@example.com</p>
+                                                        <h4><%= user ? user.username : 'User' %></h4>
+                                                        <p class="text-muted"><%= role || '' %></p>
                                                     </div>
                                                 </div>
                                             </div>
+                                        </li>
+                                        <li>
+                                            <div class="dropdown-divider"></div>
+                                            <a class="dropdown-item" href="/logout">Logout</a>
                                         </li>
                                     </ul>
                                 </li>
