@@ -6,7 +6,7 @@
 <div class="row">
     <div class="col-md-4">
         <div class="card card-stats card-round">
-            <div class="card-body">
+            <div class="card-body ">
                 <div class="row">
                     <div class="col-4">
                         <div class="icon-big text-center icon-primary bubble-shadow-small">
@@ -24,6 +24,33 @@
         </div>
     </div>
 </div>
+
+<style>
+.chart-skeleton {
+    position: relative;
+    overflow: hidden;
+    background: rgba(255,255,255,0.05);
+    border-radius: 6px;
+    min-height: 250px;
+}
+.chart-skeleton::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -150px;
+    width: 150px;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+    animation: shimmer 1.4s infinite;
+}
+@keyframes shimmer {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(300%); }
+}
+.chart-card { min-height: 320px; }
+.fade-in { opacity: 0; transition: opacity 0.5s ease; }
+.fade-in.loaded { opacity: 1; }
+</style>
 
 <div class="row">
     <div class="col-md-12">
@@ -48,4 +75,178 @@
     </div>
 </div>
 
+<div class="row">
+    <div class="col-md-6">
+        <div class="card chart-card">
+            <div class="card-header">
+                <h4 class="card-title">Birthdays per Month</h4>
+            </div>
+            <div class="card-body">
+                <div class="chart-skeleton" id="skeleton-bpm"></div>
+                <canvas id="chart-bpm" class="fade-in" style="display:none;"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card chart-card">
+            <div class="card-header">
+                <h4 class="card-title">Success vs Failed</h4>
+            </div>
+            <div class="card-body">
+                <div class="chart-skeleton" id="skeleton-status"></div>
+                <canvas id="chart-status" class="fade-in" style="display:none;"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card chart-card">
+            <div class="card-header">
+                <h4 class="card-title">Daily Bot Activity</h4>
+            </div>
+            <div class="card-body">
+                <div class="chart-skeleton" id="skeleton-daily"></div>
+                <canvas id="chart-daily" class="fade-in" style="display:none;"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card chart-card">
+            <div class="card-header">
+                <h4 class="card-title">Top Recipients</h4>
+            </div>
+            <div class="card-body">
+                <div class="chart-skeleton" id="skeleton-top"></div>
+                <canvas id="chart-top" class="fade-in" style="display:none;"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card chart-card">
+            <div class="card-header">
+                <h4 class="card-title">Last 7 Days Sent Messages</h4>
+            </div>
+            <div class="card-body">
+                <div class="chart-skeleton" id="skeleton-last7"></div>
+                <canvas id="chart-last7" class="fade-in" style="display:none;"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
 <%- include('partials/footer') %>
+<script>
+    const charts = {};
+
+    function showChart(id, skeletonId) {
+        document.getElementById(skeletonId).style.display = 'none';
+        const canvas = document.getElementById(id);
+        canvas.style.display = 'block';
+        canvas.classList.add('loaded');
+    }
+
+    function createChart(ctxId, config, skeletonId) {
+        const ctx = document.getElementById(ctxId).getContext('2d');
+        charts[ctxId] = new Chart(ctx, config);
+        showChart(ctxId, skeletonId);
+    }
+
+    async function loadChart(url, cb, skeletonId) {
+        const res = await fetch(url);
+        const json = await res.json();
+        if (json.status === 'ok') {
+            cb(json);
+            document.getElementById(skeletonId).style.display = 'none';
+        }
+    }
+
+    (async () => {
+        await loadChart('/api/stats/birthdays-per-month', (resp) => {
+            createChart('chart-bpm', {
+                type: 'bar',
+                data: {
+                    labels: resp.labels,
+                    datasets: [{
+                        label: 'Users',
+                        data: resp.data,
+                        backgroundColor: '#1d8cf8'
+                    }]
+                },
+                options: { responsive: true, plugins: { legend: { display: false } } }
+            }, 'skeleton-bpm');
+        }, 'skeleton-bpm');
+
+        await loadChart('/api/stats/message-status', (resp) => {
+            createChart('chart-status', {
+                type: 'doughnut',
+                data: {
+                    labels: resp.labels,
+                    datasets: [{
+                        data: resp.data,
+                        backgroundColor: ['#28a745', '#f5365c']
+                    }]
+                },
+                options: { responsive: true }
+            }, 'skeleton-status');
+        }, 'skeleton-status');
+
+        await loadChart('/api/stats/daily-activity', (resp) => {
+            createChart('chart-daily', {
+                type: 'line',
+                data: {
+                    labels: resp.labels,
+                    datasets: [{
+                        label: 'Messages',
+                        data: resp.data,
+                        fill: false,
+                        borderColor: '#ffa534',
+                        tension: 0.3
+                    }]
+                },
+                options: { responsive: true, plugins: { legend: { display: false } } }
+            }, 'skeleton-daily');
+        }, 'skeleton-daily');
+
+        await loadChart('/api/stats/top-recipients', (resp) => {
+            createChart('chart-top', {
+                type: 'bar',
+                data: {
+                    labels: resp.labels,
+                    datasets: [{
+                        label: 'Messages',
+                        data: resp.data,
+                        backgroundColor: '#5c7cfa'
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    plugins: { legend: { display: false } }
+                }
+            }, 'skeleton-top');
+        }, 'skeleton-top');
+
+        await loadChart('/api/stats/last7days', (resp) => {
+            createChart('chart-last7', {
+                type: 'line',
+                data: {
+                    labels: resp.labels,
+                    datasets: [{
+                        label: 'Messages',
+                        data: resp.data,
+                        fill: true,
+                        backgroundColor: 'rgba(29,140,248,0.2)',
+                        borderColor: '#1d8cf8',
+                        tension: 0.3
+                    }]
+                },
+                options: { responsive: true, plugins: { legend: { display: false } } }
+            }, 'skeleton-last7');
+        }, 'skeleton-last7');
+    })();
+</script>

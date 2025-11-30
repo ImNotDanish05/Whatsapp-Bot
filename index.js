@@ -14,6 +14,7 @@ const qrRoutes = require('./src/routes/qr');
 const settingsRoutes = require('./src/routes/settings');
 const settingsApiRoutes = require('./src/routes/api/settings');
 const groupsApiRoutes = require('./src/routes/api/groups');
+const statsApiRoutes = require('./src/routes/api/stats');
 const usersRoutes = require('./src/routes/users');
 const usersApiRoutes = require('./src/routes/api/users');
 const authRoutes = require('./src/routes/auth');
@@ -75,6 +76,7 @@ app.use('/api/qr', isAuthenticated, qrRoutes);
 app.use('/api/settings', isAuthenticated, settingsApiRoutes);
 app.use('/api/groups', isAuthenticated, hasRole(['admin', 'superadmin']), groupsApiRoutes);
 app.use('/api/users', isAuthenticated, hasRole(['admin', 'superadmin']), usersApiRoutes);
+app.use('/api/stats', isAuthenticated, statsApiRoutes);
 
 // WhatsApp Bot
 // (already required as botClient above)

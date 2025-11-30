@@ -10,7 +10,7 @@
         <div class="card">
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-striped">
+                    <table class="table table-striped" id="users-table">
                         <thead>
                             <tr>
                                 <th>Username</th>
@@ -196,6 +196,20 @@
         const res = await fetch('/api/users/' + id, { method: 'DELETE' });
         if (res.ok) location.reload(); else alert('Failed to delete user');
     }
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        if (typeof $ !== 'undefined' && $.fn.DataTable) {
+            $('#users-table').DataTable({
+                responsive: true,
+                pageLength: 10,
+                order: [],
+                language: { search: "_INPUT_", searchPlaceholder: "Search users..." },
+                dom: '<"row mb-2"<"col-sm-6"l><"col-sm-6"f>>t<"row mt-2"<"col-sm-6"i><"col-sm-6"p>>'
+            });
+        }
+    });
 </script>
 
 <%- include('partials/footer') %>
