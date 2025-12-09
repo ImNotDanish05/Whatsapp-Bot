@@ -46,15 +46,15 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'src', 'views'));
 
 // Database Connection
-mongoose.connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-}).then(() => {
-    console.log('Connected to MongoDB');
-    bootstrapSuperAdmin().catch(err => console.error('Failed to bootstrap super admin', err));
-}).catch(err => {
-    console.error('Could not connect to MongoDB', err);
-});
+mongoose.connect(process.env.MONGODB_URI)
+    .then(() => {
+        console.log('Connected to MongoDB');
+        bootstrapSuperAdmin().catch(err => console.error('Failed to bootstrap super admin', err));
+    })
+    .catch(err => {
+        console.error('Could not connect to MongoDB', err);
+    });
+
 
 // Ensure QR storage directories/state exist before bot init
 initQrState().catch(err => {

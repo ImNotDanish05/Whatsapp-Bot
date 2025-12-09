@@ -62,10 +62,8 @@ const commands = {
             const helpMessage = `Perintah yang tersedia:
 - "bantuan" - Tampilkan pesan bantuan ini
 - "ulang tahun hari ini" - Tampilkan ulang tahun hari ini
-- "daftar event" - Tampilkan event yang akan datang
-- "ulang tahun saya" - Tampilkan informasi ulang tahun saya
-- "tambah ulang tahun" - Tambahkan informasi ulang tahun
-- "tambah event" - Tambahkan informasi event
+- "daftar event" - Tampilkan semua event
+- "daftar ulang tahun" - Tampilkan semua ulang tahun
 - "ping" - Periksa apakah bot berfungsi
 - "langganan" - Berlangganan notifikasi
 - "berhenti langganan" - Berhenti dari notifikasi
@@ -119,26 +117,57 @@ const commands = {
     'list_events': {
         keywords: ['list events', 'events', 'daftar event', 'event list', 'acara', 'daftar acara', 'event apa saja', 'ada event apa', 'event hari ini', 'event mendatang'],
         handler: async (msg, conversation) => {
-            // This would query the Event model for upcoming events
-            return "Berikut adalah event yang akan datang...";
+            const Event = require('../models/Event');
+            const dayjs = require('dayjs');
+
+            try {
+                // Query the Event model for all events
+                const events = await Event.find({});
+
+                if (events.length === 0) {
+                    return "Tidak ada event yang tersimpan.";
+                } else {
+                    let text = "Daftar Event:\n";
+                    for (const event of events) {
+                        const isActiveText = event.isActive ? "aktif" : "tidak aktif";
+                        const eventDate = dayjs(event.eventDate).format("DD/MM/YYYY");
+                        const previewMessage = event.message ? `"${event.message}"` : "(pesan tidak diset)";
+                        text += `• ${event.name} - ${eventDate} (${isActiveText}) ${previewMessage}\n`;
+                    }
+                    return text;
+                }
+            } catch (error) {
+                console.error('Error getting events list:', error);
+                return "Terjadi kesalahan saat mengambil daftar event.";
+            }
         }
     },
-    'my_birthday': {
-        keywords: ['my birthday', 'ulang tahun saya', 'ultah saya', 'tgl lahir saya', 'tanggal lahir saya', 'ultah saya kapan'],
+    'list_birthdays': {
+        keywords: ['list birthdays', 'birthdays', 'daftar ulang tahun', 'ultah', 'daftar ultah', 'semua ulang tahun', 'semua ultah'],
         handler: async (msg, conversation) => {
-            return "Berikut adalah informasi ulang tahun Anda...";
-        }
-    },
-    'add_birthday': {
-        keywords: ['birthday add', 'tambah ulang tahun', 'tambah ultah', 'input ulang tahun', 'input ultah', 'daftar ulang tahun'],
-        handler: async (msg, conversation) => {
-            return "Silakan kirimkan informasi ulang tahun yang ingin ditambahkan...";
-        }
-    },
-    'add_event': {
-        keywords: ['event add', 'tambah event', 'tambah acara', 'input event', 'buat event', 'buat acara'],
-        handler: async (msg, conversation) => {
-            return "Silakan kirimkan informasi event yang ingin ditambahkan...";
+            const Birthday = require('../models/Birthday');
+            const dayjs = require('dayjs');
+
+            try {
+                // Query the Birthday model for all birthdays
+                const birthdays = await Birthday.find({});
+
+                if (birthdays.length === 0) {
+                    return "Belum ada data ulang tahun yang tersimpan.";
+                } else {
+                    let text = "Daftar Ulang Tahun:\n";
+                    for (const birthday of birthdays) {
+                        const birthDate = dayjs(birthday.birthDate);
+                        const today = dayjs();
+                        const age = today.diff(birthDate, 'year');
+                        text += `• ${birthday.name} - ${birthDate.format("DD/MM/YYYY")} (Umur: ${age} tahun)\n`;
+                    }
+                    return text;
+                }
+            } catch (error) {
+                console.error('Error getting birthdays list:', error);
+                return "Terjadi kesalahan saat mengambil daftar ulang tahun.";
+            }
         }
     },
     'subscribe': {
@@ -201,25 +230,59 @@ function formatPhoneJid(phone) {
 // Main message handler
 async function handleIncomingMessage(msg) {
     try {
+        // Check if the message is from a group
+        const isGroupMessage = msg.from.endsWith('@g.us');
+
+        let text = msg.body || "";
+        // If it's a group message and the bot is not mentioned, ignore the message
+        if (isGroupMessage) {
+            const botName = (process.env.BOT_NAME || "dan").toLowerCase().trim();
+            const prefix = `!${botName}`;
+
+            const raw = (msg.body || "").trim().toLowerCase();
+
+            console.log("[GROUP MESSAGE] PrefixCheck =>", {
+                botName,
+                prefix,
+                message: raw,
+                startsWithPrefix: raw.startsWith(prefix)
+            });
+
+            // If bot not called → ignore
+            if (!botName || !raw.startsWith(prefix)) {
+                console.log("GROUP: Bot not called → ignoring message");
+                return;
+            }
+
+            // Remove prefix from message before parsing commands
+            text = raw.replace(prefix, "").trim();
+        } else {
+            // Private chat → process normally
+            text = msg.body || "";
+        }
+
+
+
         // Normalize the message text
-        const normalizedText = msg.body.toLowerCase().trim();
-        
+        const normalizedText = text.toLowerCase().trim();
+        console.log(`Received message from ${msg.from}: ${normalizedText}`);
+
         // Get phone without @c.us suffix
         const phone = msg.from.replace('@c.us', '');
-        
+
         // Get or create conversation record
         let conversation = await Conversation.findOne({ phone });
         if (!conversation) {
             conversation = new Conversation({ phone });
             await conversation.save();
         }
-        
+
         // Determine if this is a new conversation or if last message was over 1 hour ago
         const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000); // 1 hour in milliseconds
         const isNewConversation = !conversation.lastMessageAt || conversation.lastMessageAt < oneHourAgo;
-        
+
         let responseMessage = '';
-        
+
         if (isNewConversation) {
             // Send opening message for new or returning users
             responseMessage = `Halo! Saya asisten WhatsApp Anda. Anda bisa meminta bantuan, memeriksa ulang tahun, event, atau berbicara dengan AI. Ketik "bantuan" untuk melihat perintah yang tersedia.`;
@@ -263,11 +326,11 @@ async function handleIncomingMessage(msg) {
                 }
             }
         }
-        
+
         // Update last message timestamp
         conversation.lastMessageAt = new Date();
         await conversation.save();
-        
+
         // Send response
         if (responseMessage && whatsappClient) {
             await whatsappClient.sendMessage(msg.from, responseMessage);
