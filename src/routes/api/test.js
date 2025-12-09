@@ -4,7 +4,8 @@ const {
     sendTestMessage,
     pingBot,
     getTestLogs,
-    simulateCron
+    simulateCron,
+    testHandleMessage
 } = require('../../controllers/testController');
 
 const { sendEvent, simulateEventCron } = require('../../controllers/testController');
@@ -26,5 +27,8 @@ router.route('/sendEvent')
 
 router.route('/cronEvent')
     .post(simulateEventCron);
+
+router.route('/handleMessage')
+    .post(testHandleMessage);
 
 module.exports = router;

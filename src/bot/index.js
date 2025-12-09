@@ -63,8 +63,16 @@ client.on('authenticated', async (session) => {
     }
 });
 
-client.on('message', msg => {
+const { handleIncomingMessage, attachClient } = require('./handler');
+
+// Attach the client instance to the handler after initialization
+attachClient(client);
+
+client.on('message', async msg => {
     webSocket.broadcast({ type: 'incoming', message: `New message from ${msg.from}: ${msg.body}` });
+
+    // Handle the incoming message with our conversational handler
+    await handleIncomingMessage(msg);
 });
 
 client.on('auth_failure', msg => {

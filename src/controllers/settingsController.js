@@ -23,7 +23,9 @@ exports.updateSettings = async (req, res) => {
             groupMessageTemplate,
             statusEnabled,
             statusTemplate,
-            sendOnStartupEnabled
+            sendOnStartupEnabled,
+            aiApiToken,
+            aiModelName
         } = req.body;
 
         const settings = await getOrCreateSettings();
@@ -41,6 +43,8 @@ exports.updateSettings = async (req, res) => {
         settings.statusEnabled = statusEnabled !== undefined ? !!statusEnabled : settings.statusEnabled;
         settings.statusTemplate = statusTemplate || DEFAULTS.statusTemplate;
         settings.sendOnStartupEnabled = sendOnStartupEnabled !== undefined ? !!sendOnStartupEnabled : settings.sendOnStartupEnabled;
+        settings.aiApiToken = aiApiToken !== undefined ? aiApiToken : settings.aiApiToken;
+        settings.aiModelName = aiModelName !== undefined ? aiModelName : settings.aiModelName;
         settings.updatedAt = new Date();
 
         await settings.save();

@@ -94,6 +94,32 @@
     </div>
 </div>
 
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">AI Chat Settings</h4>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="aiApiToken">AI API Token</label>
+                    <input type="password" id="aiApiToken" class="form-control" placeholder="Enter AI API token" <%= canEditSettings ? '' : 'disabled' %>>
+                    <p class="text-muted small mt-1">API token for the AI chat feature</p>
+                </div>
+                <div class="form-group">
+                    <label for="aiModelName">AI Model Name</label>
+                    <select id="aiModelName" class="form-control" <%= canEditSettings ? '' : 'disabled' %>>
+                        <option value="gemini-2.5-pro">gemini-2.5-pro</option>
+                        <option value="gemini-2.5-flash">gemini-2.5-flash</option>
+                        <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite</option>
+                    </select>
+                    <p class="text-muted small mt-1">AI model to use for chat functionality</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="row mt-3">
     <div class="col-12">
         <div class="d-flex align-items-center">
@@ -124,6 +150,8 @@
             document.getElementById('statusEnabled').checked = s.statusEnabled;
             document.getElementById('statusTemplate').value = s.statusTemplate || '';
             document.getElementById('sendOnStartupEnabled').checked = s.sendOnStartupEnabled;
+            document.getElementById('aiApiToken').value = s.aiApiToken || '';
+            document.getElementById('aiModelName').value = s.aiModelName || 'gemini-2.5-pro';
             document.getElementById('settings-updated-at').textContent = s.updatedAt ? 'Updated at ' + new Date(s.updatedAt).toLocaleString() : '';
         }
     }
@@ -236,7 +264,9 @@
             selectedGroups,
             statusEnabled: document.getElementById('statusEnabled').checked,
             statusTemplate: document.getElementById('statusTemplate').value,
-            sendOnStartupEnabled: document.getElementById('sendOnStartupEnabled').checked
+            sendOnStartupEnabled: document.getElementById('sendOnStartupEnabled').checked,
+            aiApiToken: document.getElementById('aiApiToken').value,
+            aiModelName: document.getElementById('aiModelName').value
         };
 
         const res = await fetch('/api/settings/update', {

@@ -38,6 +38,14 @@ const settingsSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    aiApiToken: {
+        type: String,
+        default: ''
+    },
+    aiModelName: {
+        type: String,
+        default: 'gemini-2.5-pro'
+    },
     updatedAt: {
         type: Date,
         default: Date.now

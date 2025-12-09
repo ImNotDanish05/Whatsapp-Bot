@@ -161,3 +161,68 @@ exports.simulateEventCron = async (req, res) => {
         res.status(500).json({ message: 'Server Error', error });
     }
 };
+
+// @desc    Test handling of incoming message
+// @route   POST /api/test/handleMessage
+// @access  Public
+exports.testHandleMessage = async (req, res) => {
+    try {
+        const { phone, message } = req.body;
+
+        if (!phone || !message) {
+            return res.status(400).json({
+                message: 'Phone and message are required'
+            });
+        }
+
+        // Format phone to proper JID format
+        let formattedPhone = phone;
+        if (!formattedPhone.includes('@c.us')) {
+            if (formattedPhone.startsWith('62')) {
+                formattedPhone = `${formattedPhone}@c.us`;
+            } else if (formattedPhone.startsWith('+')) {
+                formattedPhone = `${formattedPhone.substring(1)}@c.us`;
+            } else if (formattedPhone.startsWith('0')) {
+                formattedPhone = `62${formattedPhone.substring(1)}@c.us`;
+            } else {
+                formattedPhone = `62${formattedPhone}@c.us`;
+            }
+        }
+
+        // Create a mock message object similar to what whatsapp-web.js would provide
+        const mockMessage = {
+            from: formattedPhone,
+            body: message,
+            id: { _serialized: `mock_${Date.now()}` },
+            timestamp: Math.floor(Date.now() / 1000),
+            type: 'chat',
+            isForwarded: false,
+            hasMedia: false
+        };
+
+        // Process the message through our handler
+        const { handleIncomingMessage } = require('../bot/handler');
+        await handleIncomingMessage(mockMessage);
+
+        res.status(200).json({
+            message: 'Message processed successfully',
+            processed: true
+        });
+    } catch (error) {
+        console.error('Test handle message error:', error);
+
+        const newLog = new TestLog({
+            phone: req.body.phone || '',
+            message: req.body.message || '',
+            response: error.message,
+            status: 'failed',
+            type: 'handle-message-test'
+        });
+        await newLog.save();
+
+        res.status(500).json({
+            message: 'Failed to process message',
+            error: error.message
+        });
+    }
+};

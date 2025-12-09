@@ -9,7 +9,9 @@ const DEFAULTS = {
     groupMessageTemplate: 'Everyone say happy birthday to %name%!',
     statusEnabled: false,
     statusTemplate: 'Happy Birthday %name%!',
-    sendOnStartupEnabled: false
+    sendOnStartupEnabled: false,
+    aiApiToken: '',
+    aiModelName: 'gemini-2.5-pro'
 };
 
 async function getOrCreateSettings() {
@@ -72,11 +74,24 @@ function normalizeGroupEntry(entry) {
     return { name, id };
 }
 
+function renderTemplate(template, recipient, eventOrBirthday) {
+    if (!template) return '';
+
+    // For now, just return a basic template replacement
+    // This could be expanded to handle more complex replacements
+    return template
+        .replace(/%name%/g, recipient.name || '')
+        .replace(/%age%/g, eventOrBirthday.age ? eventOrBirthday.age.toString() : '')
+        .replace(/%birthday%/g, eventOrBirthday.birthday || '')
+        .replace(/%born%/g, eventOrBirthday.born || '');
+}
+
 module.exports = {
     getOrCreateSettings,
     formatTemplate,
     normalizeGroupId,
     normalizeGroupEntry,
     renderEventMessage,
+    renderTemplate,
     DEFAULTS
 };
