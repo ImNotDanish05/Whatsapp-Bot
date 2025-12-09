@@ -65,6 +65,14 @@
                             </a>
                         </li>
                         <% } %>
+                        <% if (hasRole(['admin','operator','superadmin'])) { %>
+                        <li class="nav-item">
+                            <a href="/events">
+                                <i class="fas fa-calendar-alt"></i>
+                                <p>Events</p>
+                            </a>
+                        </li>
+                        <% } %>
                         <% if (hasRole(['admin','operator','viewer','auditor','superadmin'])) { %>
                         <li class="nav-item">
                             <a href="/logs">

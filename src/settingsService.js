@@ -34,6 +34,25 @@ function formatTemplate(template, birthday) {
         .replace(/%birthdate%/g, formattedDate);
 }
 
+function renderEventMessage(template, recipient, event) {
+    if (!template) return '';
+    const today = dayjs();
+    const ed = event.eventDate ? dayjs(event.eventDate) : null;
+
+    const age = ed ? (today.year() - ed.year()) : '';
+
+    const birthday = ed ? ed.format('DD MMM YYYY') : '';
+    const born = ed ? ed.format('DD/MM/YYYY') : '';
+
+    const name = (recipient && typeof recipient === 'object') ? (recipient.name || '') : (recipient || '');
+
+    return template
+        .replace(/%name%/g, name || '')
+        .replace(/%age%/g, age !== '' ? String(age) : '')
+        .replace(/%birthday%/g, birthday)
+        .replace(/%born%/g, born);
+}
+
 function normalizeGroupId(groupId) {
     if (!groupId) return null;
     const trimmed = groupId.trim();
@@ -58,5 +77,6 @@ module.exports = {
     formatTemplate,
     normalizeGroupId,
     normalizeGroupEntry,
+    renderEventMessage,
     DEFAULTS
 };

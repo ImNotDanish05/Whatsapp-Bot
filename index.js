@@ -19,6 +19,8 @@ const usersRoutes = require('./src/routes/users');
 const usersApiRoutes = require('./src/routes/api/users');
 const authRoutes = require('./src/routes/auth');
 const { runScheduler } = require('./src/bot/scheduler');
+const eventApiRoutes = require('./src/routes/eventRoutes');
+const dayjs = require('dayjs');
 const { initQrState } = require('./src/qrService');
 const webSocket = require('./src/websocket');
 const botClient = require('./src/bot/index');
@@ -68,6 +70,8 @@ app.use('/test', isAuthenticated, hasRole(['admin', 'operator', 'superadmin']), 
 app.use('/settings', isAuthenticated, settingsRoutes);
 app.use('/users', isAuthenticated, hasRole(['admin', 'superadmin']), usersRoutes);
 
+// Events page is served by `src/routes/index.js` (mounted at `/`)
+
 // Protected APIs
 app.use('/api/birthdays', isAuthenticated, hasRole(['admin', 'operator', 'superadmin']), birthdayRoutes);
 app.use('/api/logs', isAuthenticated, hasRole(['admin', 'operator', 'viewer', 'auditor', 'superadmin']), logRoutes);
@@ -77,6 +81,8 @@ app.use('/api/settings', isAuthenticated, settingsApiRoutes);
 app.use('/api/groups', isAuthenticated, hasRole(['admin', 'superadmin']), groupsApiRoutes);
 app.use('/api/users', isAuthenticated, hasRole(['admin', 'superadmin']), usersApiRoutes);
 app.use('/api/stats', isAuthenticated, statsApiRoutes);
+// Events API
+app.use('/api/events', isAuthenticated, hasRole(['admin', 'operator', 'superadmin']), eventApiRoutes);
 
 // WhatsApp Bot
 // (already required as botClient above)
@@ -84,7 +90,7 @@ app.use('/api/stats', isAuthenticated, statsApiRoutes);
 // Cron Job
 // Runs every day at midnight
 cron.schedule('0 0 * * *', () => {
-    console.log('Running birthday check...');
+    console.log('Running birthday + event check...');
     runScheduler();
 });
 

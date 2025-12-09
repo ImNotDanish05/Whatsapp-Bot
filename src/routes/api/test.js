@@ -7,6 +7,8 @@ const {
     simulateCron
 } = require('../../controllers/testController');
 
+const { sendEvent, simulateEventCron } = require('../../controllers/testController');
+
 router.route('/send')
     .post(sendTestMessage);
 
@@ -18,5 +20,11 @@ router.route('/logs')
 
 router.route('/cron')
     .post(simulateCron);
+
+router.route('/sendEvent')
+    .post(sendEvent);
+
+router.route('/cronEvent')
+    .post(simulateEventCron);
 
 module.exports = router;

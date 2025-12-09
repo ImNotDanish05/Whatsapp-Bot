@@ -10,6 +10,10 @@ const logSchema = new mongoose.Schema({
         enum: ['success', 'failed'],
         required: true
     },
+    type: {
+        type: String,
+        default: null
+    },
     sentAt: {
         type: Date,
         default: Date.now
