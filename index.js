@@ -89,7 +89,7 @@ app.use('/api/events', isAuthenticated, hasRole(['admin', 'operator', 'superadmi
 
 // Cron Job
 // Runs every day at midnight
-cron.schedule('0 0 * * *', () => {
+cron.schedule('0 7 * * *', () => {
     console.log('Running birthday + event check...');
     runScheduler();
 });
