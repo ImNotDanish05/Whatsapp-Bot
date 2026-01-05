@@ -69,17 +69,18 @@ exports.deleteBirthday = async (req, res) => {
 exports.exportBirthdaysCSV = async (req, res) => {
     try {
         const birthdays = await Birthday.find();
-        
+
         // Create CSV header
-        let csv = 'name,birthDate\n';
-        
+        let csv = 'name,phone,birthDate\n';
+
         // Add data rows
         birthdays.forEach(birthday => {
             const name = `"${birthday.name.replace(/"/g, '""')}"`;
+            const phone = `"${birthday.phone.replace(/"/g, '""')}"`;
             const birthDate = birthday.birthDate.toISOString().split('T')[0];
-            csv += `${name},${birthDate}\n`;
+            csv += `${name},${phone},${birthDate}\n`;
         });
-        
+
         // Set headers for file download
         res.setHeader('Content-Type', 'text/csv');
         res.setHeader('Content-Disposition', 'attachment; filename=birthdays.csv');
@@ -89,6 +90,7 @@ exports.exportBirthdaysCSV = async (req, res) => {
     }
 };
 
+
 // @desc    Import birthdays from CSV
 // @route   POST /api/birthdays/import
 // @access  Public
@@ -97,39 +99,40 @@ exports.importBirthdaysCSV = async (req, res) => {
         if (!req.file) {
             return res.status(400).json({ message: 'No file uploaded' });
         }
-        
+
         const csvContent = req.file.buffer.toString('utf-8');
         const lines = csvContent.split('\n').filter(line => line.trim());
-        
+
         if (lines.length === 0) {
             return res.status(400).json({ message: 'CSV file is empty' });
         }
-        
+
         // Parse header
         const header = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
         const nameIndex = header.indexOf('name');
+        const phoneIndex = header.indexOf('phone');
         const birthDateIndex = header.indexOf('birthDate');
-        
+
         // Validate required columns
-        if (nameIndex === -1 || birthDateIndex === -1) {
-            return res.status(400).json({ 
-                message: 'CSV must contain "name" and "birthDate" columns' 
+        if (nameIndex === -1 || phoneIndex === -1 || birthDateIndex === -1) {
+            return res.status(400).json({
+                message: 'CSV must contain "name", "phone", and "birthDate" columns'
             });
         }
-        
+
         const errors = [];
         const successfulImports = [];
-        
+
         // Process data rows
         for (let i = 1; i < lines.length; i++) {
             const line = lines[i];
             if (!line.trim()) continue;
-            
+
             // Simple CSV parsing (handles quoted values)
             const values = [];
             let current = '';
             let inQuotes = false;
-            
+
             for (let char of line) {
                 if (char === '"') {
                     inQuotes = !inQuotes;
@@ -141,37 +144,43 @@ exports.importBirthdaysCSV = async (req, res) => {
                 }
             }
             values.push(current.trim().replace(/^"|"$/g, ''));
-            
+
             const name = values[nameIndex];
+            const phone = values[phoneIndex];
             const birthDate = values[birthDateIndex];
-            
+
             // Validate data
             if (!name || name.trim() === '') {
                 errors.push(`Row ${i + 1}: Name is required`);
                 continue;
             }
-            
+
+            if (!phone || phone.trim() === '') {
+                errors.push(`Row ${i + 1}: Phone is required`);
+                continue;
+            }
+
             const parsedDate = new Date(birthDate);
             if (isNaN(parsedDate.getTime())) {
                 errors.push(`Row ${i + 1}: Invalid date format for "${birthDate}"`);
                 continue;
             }
-            
+
             try {
-                // Create birthday with default phone value
+                // Create birthday
                 const newBirthday = new Birthday({
                     name: name.trim(),
-                    phone: 'N/A',
+                    phone: phone.trim(),
                     birthDate: parsedDate
                 });
-                
+
                 await newBirthday.save();
                 successfulImports.push(name);
             } catch (err) {
                 errors.push(`Row ${i + 1}: ${err.message}`);
             }
         }
-        
+
         res.status(200).json({
             message: `Successfully imported ${successfulImports.length} birthdays`,
             imported: successfulImports.length,
@@ -182,3 +191,17 @@ exports.importBirthdaysCSV = async (req, res) => {
     }
 };
 
+// @desc    Delete all birthdays
+// @route   DELETE /api/birthdays/all
+// @access  Public
+exports.deleteAllBirthdays = async (req, res) => {
+    try {
+        const result = await Birthday.deleteMany({});
+        res.status(200).json({
+            message: 'All birthdays deleted successfully',
+            deletedCount: result.deletedCount
+        });
+    } catch (error) {
+        res.status(500).json({ message: 'Server Error', error });
+    }
+};

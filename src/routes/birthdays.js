@@ -7,7 +7,8 @@ const {
     updateBirthday,
     deleteBirthday,
     exportBirthdaysCSV,
-    importBirthdaysCSV
+    importBirthdaysCSV,
+    deleteAllBirthdays
 } = require('../controllers/birthdayController');
 
 // Configure multer for file upload (memory storage)
@@ -18,6 +19,9 @@ router.get('/export', exportBirthdaysCSV);
 
 // Import route
 router.post('/import', upload.single('file'), importBirthdaysCSV);
+
+// Delete all route
+router.delete('/all', deleteAllBirthdays);
 
 router.route('/')
     .get(getBirthdays)

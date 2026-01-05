@@ -9,6 +9,9 @@
             <button onclick="document.getElementById('csvFileInput').click()" class="btn btn-info btn-round me-2">
                 <i class="fa fa-upload"></i> Import CSV
             </button>
+            <button onclick="deleteAllBirthdays()" class="btn btn-danger btn-round me-2">
+                <i class="fa fa-trash"></i> Delete All
+            </button>
             <button onclick="openModal('addBirthdayModal')" class="btn btn-primary btn-round">Add Birthday</button>
         </div>
     </div>
@@ -284,6 +287,65 @@
 
             // Reset file input
             event.target.value = '';
+        }
+
+        // Delete All Birthdays function
+        async function deleteAllBirthdays() {
+            swal({
+                title: "Are you sure?",
+                text: "This will permanently delete ALL birthday data.",
+                icon: "warning",
+                buttons: {
+                    cancel: {
+                        text: "Cancel",
+                        value: null,
+                        visible: true,
+                        className: "btn btn-secondary",
+                        closeModal: true,
+                    },
+                    confirm: {
+                        text: "Yes, delete all",
+                        value: true,
+                        visible: true,
+                        className: "btn btn-danger",
+                        closeModal: true
+                    }
+                },
+                dangerMode: true,
+            })
+                .then(async (willDelete) => {
+                    if (willDelete) {
+                        try {
+                            const response = await fetch('/api/birthdays/all', {
+                                method: 'DELETE'
+                            });
+
+                            const result = await response.json();
+
+                            if (!response.ok) {
+                                throw new Error(result.message || 'Delete failed');
+                            }
+
+                            // Show success message
+                            swal({
+                                title: "Deleted!",
+                                text: result.message,
+                                icon: "success",
+                                button: "OK",
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } catch (error) {
+                            console.error('Delete error:', error);
+                            swal({
+                                title: "Error!",
+                                text: 'Failed to delete birthdays: ' + error.message,
+                                icon: "error",
+                                button: "OK",
+                            });
+                        }
+                    }
+                });
         }
 
         // Notification helper function
